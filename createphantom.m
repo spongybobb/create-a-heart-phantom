@@ -1,5 +1,5 @@
 %=====================================
-%create phantom for MRiLab simulation
+%Create phantom for MRiLab simulation
 %version 1.0
 %This script is adapted from MRiLab
 %Author: Hongzhang Chen
@@ -107,11 +107,15 @@ for j = 1:1:4 %loop the code 4 times to produce 4 different phantoms
     T2Star=[0.01];
     TypeFlag=[0];
     TypeIdx=[1];
+    
+    %create 3D sphere virtual object
     [mask, fvc]=VObjSphere(p,x,y,z,flag);
     Obj{1,2}=fvc;
     Obj{2,2}=Color;
     Obj{3,2}=Alpha;
 
+    %tissue properties assignment---------------------------------
+    %element-wise multiplication for matrices
     rho(:,:,:,TypeIdx)=rho(:,:,:,TypeIdx)+mask.*Rho-mask.*master.Rho; 
     t1(:,:,:,TypeIdx)=t1(:,:,:,TypeIdx)+mask.*T1-mask.*master.T1;
     t2(:,:,:,TypeIdx)=t2(:,:,:,TypeIdx)+mask.*T2-mask.*master.T2;
@@ -120,15 +124,21 @@ for j = 1:1:4 %loop the code 4 times to produce 4 different phantoms
     econ(:,:,:,1)=econ(:,:,:,1)+mask.*ECon(1)-mask.*master.ECon(1);
     econ(:,:,:,2)=econ(:,:,:,2)+mask.*ECon(2)-mask.*master.ECon(2);
     econ(:,:,:,3)=econ(:,:,:,3)+mask.*ECon(3)-mask.*master.ECon(3);
+    %direct assignment for single values
     chemshift(TypeIdx)=ChemShift;
     typeflag(TypeIdx)=TypeFlag;
     lineshapeflag(TypeIdx)=LineShapeFlag;
+    %--------------------------------------------------------------
     if ~strcmp(VObj.Model,'Normal')
         for i=1:VObj.TypeNum
             k(:,:,:,(TypeIdx-1)*VObj.TypeNum+i)=k(:,:,:,(TypeIdx-1)*VObj.TypeNum+i)+mask.*K(i);
         end
     end
     p=[];
+    
+    %--------------------------------------------------------------------
+    %Sphere 3,4,5 have the same dimensions and remain unchanged
+    %--------------------------------------------------------------------
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%% Sphere 3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     Alpha=[1];
@@ -257,9 +267,10 @@ for j = 1:1:4 %loop the code 4 times to produce 4 different phantoms
         end
     end
     p=[];
-    %---------------------
-
-
+    %----------------------------------------------------------------------------
+    
+    
+    %Assigning the properties to the struct, VObj
     VObj.Rho=rho;
     VObj.T1=t1;
     VObj.T2=t2;
